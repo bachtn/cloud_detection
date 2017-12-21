@@ -120,7 +120,7 @@ void ShowImaComputed(GtkObject *button_analyse,
    pucImaRes=gdk_pixbuf_get_pixels(pGdkPixbufImaRes);
 
    /* on realise le calcul sur l'image */
-   ComputeImage(pucImaOrig,NbLine,NbCol,pucImaRes);
+   compute_image(pucImaOrig,NbLine,NbCol,pucImaRes);
 
    /* on vide l'image resultat precedente */
    gtk_image_clear(GTK_IMAGE(*(ppwTabArgs+5)));
