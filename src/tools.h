@@ -19,7 +19,7 @@ typedef struct Image {
 // Image
 void grayscale(struct Image *img, guchar *img_res);
 // Distance
-double euclidean_distance(unsigned* vec1, unsigned* vec2, int vec_size);
+double euclidean_distance(unsigned* vec, unsigned cluster_value);
 // Sort
 void quick_sort(unsigned *arr, size_t low, size_t high);
 size_t partition (unsigned *arr, size_t low, size_t high);

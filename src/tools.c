@@ -18,17 +18,19 @@ void grayscale(struct Image *img_struct, guchar *img_res) {
 }
 
 // Compute distance
-double euclidean_distance(unsigned* vec1, unsigned* vec2, int vec_size) {
+double euclidean_distance(unsigned* vec, unsigned cluster_value) {
+  // Becuase the clusters coordinates are in the homogenious space,
+  // we only need one value to compute their distance
   double dist = 0;
-  for (size_t i = 0; i < vec_size; ++i)
-    dist += pow(vec1[i] - vec2[i], 2);
+  for (size_t i = 0; i < VECTOR_SIZE; ++i)
+    dist += pow(vec[i] - cluster_value, 2);
   return dist;
 }
 
 // Sort array
 void quick_sort(unsigned *arr, size_t low, size_t high) {
     int q;
-    //printf("%d, %d, %d\n", arr[low], low, high);
+    printf("%d, %d, %d\n", arr[low], low, high);
     if (low < high) {
         q = partition(arr, low, high);
         quick_sort(arr, low, q);
@@ -77,5 +79,6 @@ void swap(unsigned *a, unsigned *b) {
 void print_array(unsigned *arr, size_t array_size) {
   for (size_t i = 0; i < array_size; ++i)
     printf("%d ", arr[i]);
-  printf("\n");
+  printf("\n\n\n");
+
 }
