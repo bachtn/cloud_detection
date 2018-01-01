@@ -1,16 +1,18 @@
 #include "kmeans.h"
 
 void kmeans(struct Image *res_img_struct, unsigned* pixel_clusters) {
-  // Returns the cluster of each pixel
-  // Init the centroid coordinate of each cluster
-  // Each centroid is caracterised by a single coordinate because they are
-  // projected on the homogenious axes (All vector coordinates are the same)
+  /* Returns the cluster of each pixel
+   * Init the centroid coordinate of each cluster
+   * Each centroid is caracterised by a single coordinate because
+   * they are projected on the homogenious axes (All vector
+   * coordinates are the same)
+   */
   unsigned *centroids = malloc(sizeof(unsigned) * NB_CLUSTERS);
   init_cluster_centroids(NB_CLUSTERS, centroids);
   //quick_sort(centroids, 0, NB_CLUSTERS - 1);
   //print_array(centroids, NB_CLUSTERS);
 
-  // Init the pixel vectors (Vector that contains the pixel with its 4 neighbors)
+  // Init the pixel vectors (Vector of the pixel with its 4 neighbors)
   int nb_vectors = (res_img_struct->width - 2) * (res_img_struct->height - 2);
   unsigned **pixel_vectors = malloc(sizeof(unsigned*) * nb_vectors);
   get_pixel_vectors(res_img_struct, pixel_vectors);
@@ -19,23 +21,28 @@ void kmeans(struct Image *res_img_struct, unsigned* pixel_clusters) {
   unsigned *old_centroids = (unsigned *) calloc(NB_CLUSTERS, sizeof(unsigned));
 
   do {
+    // Conserve the old clusters (needed for convergence check)
     copy_vector(centroids, NB_CLUSTERS, old_centroids);
+    // Assign new clusters to the pixels depending on the new clusters
+    // coordinates
     assign_cluster(pixel_vectors, centroids, pixel_clusters);
+    // Update the cluster coordinates depending on the new pixel clusters
     update_cluster_centroids(pixel_vectors, pixel_clusters, centroids);
   } while (++nb_iterations < MAX_ITERATIONS || has_converged(centroids, old_centroids));
 }
 
 
-// 1 - Computes the distance between each pixel vector and each cluster centroid
-// 2 - Assign each pixel to the nearest cluster
-// 3 - COmputes the new coordinates of each cluster centroid
 void assign_cluster(unsigned **pixel_vectors, unsigned *centroids,
+    /* Computes the distance between each pixel vector and each cluster centroid
+     * Assign each pixel to the nearest cluster
+     */
     unsigned *pixel_clusters) {
   //FIXME
    
 }
 
 void update_cluster_centroids(unsigned **pixel_vectors, unsigned *pixel_clusters,
+    // Computes the new coordinates of each cluster centroid
     unsigned *centroids) {
   //FIXME
 }
@@ -56,8 +63,11 @@ int has_converged(unsigned *current_centroid_vectors, unsigned *old_centroid_vec
   return 0;
 }
 
-void get_pixel_vectors(struct Image *img_struct, unsigned **pixel_vectors) {
-  // The boundary pixels are not taken into account
+void get_pixel_vectors(struct Image *img_struct,
+    unsigned **pixel_vectors) {
+  /* Returns each pixel with its 4 neighbors (up,right,bottom,left)
+   * The boundary pixels are not taken into account
+   */
   for (size_t y = 1; y < img_struct->width - 1; ++y) {
     for (size_t x = 1; x < img_struct->height - 1; ++x) {
       unsigned pixel_idx = get_pixel_index(x, y, img_struct->width);
@@ -67,7 +77,9 @@ void get_pixel_vectors(struct Image *img_struct, unsigned **pixel_vectors) {
   }
 }
 
-void get_pixel_vector(struct Image *img_struct, unsigned x, unsigned y, unsigned *pixel_vector) {
+void get_pixel_vector(struct Image *img_struct, unsigned x,
+    unsigned y, unsigned *pixel_vector) {
+  // Return a vector with the pixel and its 4 neighbors
   pixel_vector[0] = img_struct->src[get_pixel_index(x, y-1,
       img_struct->width) * NB_CHANNELS]; // up
   pixel_vector[1] = img_struct->src[get_pixel_index(x-1, y,
