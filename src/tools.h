@@ -1,8 +1,33 @@
+#ifndef _TOOLSH_
+#define _TOOLSH_
+
 #include <math.h>
 #include <stddef.h>
+#include<stdio.h>
+#include <gtk/gtk.h>
+#include <stdlib.h>
 
-/** Brief Computes the distance between 2 vectors.
- * \param vec1, vec2 pointer to unsigned vector with size vec_size
- * \param vec_size the size of the vectors
- */
+#define VECTOR_SIZE 5
+#define NB_CHANNELS 3
+
+typedef struct Image {
+  guchar *src;
+  size_t width;
+  size_t height;
+} Image;
+
+// Image
+void grayscale(struct Image *img, guchar *img_res);
+// Distance
 double euclidean_distance(unsigned* vec1, unsigned* vec2, int vec_size);
+// Sort
+void quick_sort(unsigned *arr, size_t low, size_t high);
+size_t partition (unsigned *arr, size_t low, size_t high);
+// Other
+void copy_vector(unsigned *src_vector, size_t vector_size, unsigned *res_vector);
+void fill_vector(unsigned value, unsigned *vector);
+unsigned get_pixel_index(unsigned x, unsigned y, size_t width);
+void print_array(unsigned *arr, size_t array_size);
+void swap(unsigned *a, unsigned *b);
+
+#endif

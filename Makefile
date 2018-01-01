@@ -13,7 +13,7 @@ CCFLAGS=-Wall -g `pkg-config --cflags gtk+-2.0`
 LDFLAGS=`pkg-config --libs gtk+-2.0` -lm
 
 #compilation
-OBJ_FILES= src/tools.o src/compute.o src/main.o 
+OBJ_FILES= src/tools.o src/kmeans.o src/compute.o src/main.o 
 
 all: ImaProjet.exe
 
