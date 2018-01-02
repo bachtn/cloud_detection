@@ -11,8 +11,7 @@ void compute_image(guchar *img_src, int nb_line, int nb_col,
     .src = img_res, .width = nb_col, .height = nb_line
   };
   // Init Pixel clusrters
-  unsigned *pixel_clusters = (unsigned *) calloc((nb_col - 2) *
-      (nb_line - 2), sizeof(unsigned));
+  unsigned *pixel_clusters = calloc((nb_col - 2) * (nb_line - 2), sizeof(unsigned));
   // Assign clusters with kmeans algorithm
   kmeans(&res_img_struct, pixel_clusters);
   // Color clusters

@@ -2,7 +2,6 @@
 
 void grayscale(struct Image *img_struct, guchar *img_res) {
   printf("Segmentation de l'image.... A vous!\n");
-  //printf("%zu, %zu\n", img_struct->height, img_struct->width);
   for (size_t y = 0; y < img_struct->height; ++y) {
     for (size_t x = 0; x < img_struct->width; ++x) {
       unsigned pixel_idx = get_pixel_index(x, y, img_struct->width) * NB_CHANNELS;
@@ -22,15 +21,16 @@ double euclidean_distance(unsigned* vec, unsigned cluster_value) {
   // Becuase the clusters coordinates are in the homogenious space,
   // we only need one value to compute their distance
   double dist = 0;
-  for (size_t i = 0; i < VECTOR_SIZE; ++i)
-    dist += pow(vec[i] - cluster_value, 2);
+  for (size_t i = 0; i < VECTOR_SIZE; ++i) {
+    unsigned x = vec[i] - cluster_value;
+    dist += x * x;
+  }
   return dist;
 }
 
 // Sort array
 void quick_sort(unsigned *arr, size_t low, size_t high) {
     int q;
-    printf("%d, %d, %d\n", arr[low], low, high);
     if (low < high) {
         q = partition(arr, low, high);
         quick_sort(arr, low, q);
@@ -60,9 +60,8 @@ void copy_vector(unsigned *src_vector, size_t vector_size, unsigned *res_vector)
     res_vector[i] = src_vector[i];
 }
 
-void fill_vector(unsigned value, unsigned *vector) {
-  printf("Centroid value = %d\n", value); 
-  for (size_t i = 0; i < VECTOR_SIZE; ++i)
+void fill_vector(unsigned value, unsigned vector_size, unsigned *vector) {
+  for (size_t i = 0; i < vector_size; ++i)
     vector[i] = value;
 }
 

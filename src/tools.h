@@ -25,7 +25,7 @@ void quick_sort(unsigned *arr, size_t low, size_t high);
 size_t partition (unsigned *arr, size_t low, size_t high);
 // Other
 void copy_vector(unsigned *src_vector, size_t vector_size, unsigned *res_vector);
-void fill_vector(unsigned value, unsigned *vector);
+void fill_vector(unsigned value, unsigned vector_size, unsigned *vector);
 unsigned get_pixel_index(unsigned x, unsigned y, size_t width);
 void print_array(unsigned *arr, size_t array_size);
 void swap(unsigned *a, unsigned *b);
