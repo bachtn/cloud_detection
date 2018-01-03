@@ -151,7 +151,7 @@ void get_pixel_vectors(struct Image *img_struct, unsigned **pixel_vectors) {
       unsigned pixel_idx = get_pixel_index(x - 1, y - 1, img_struct->width - 2);
       pixel_vectors[pixel_idx] = malloc(sizeof(unsigned) * VECTOR_SIZE);
       get_pixel_vector(img_struct, x, y, pixel_vectors[pixel_idx]);
-        quick_sort(pixel_vectors[pixel_idx], 0, VECTOR_SIZE);
+      quick_sort(pixel_vectors[pixel_idx], 0, VECTOR_SIZE);
     }
   }
 }
@@ -179,15 +179,19 @@ void color_clusters(struct Image *res_img_struct, unsigned *pixel_clusters) {
       unsigned pixel_idx = get_pixel_index(x, y, res_img_struct->width) * NB_CHANNELS;
       unsigned idx = get_pixel_index(x - 1, y - 1, res_img_struct->width - 2);
       unsigned aux = NB_CLUSTERS * CLOUD_PERCENT;
-      printf("%d, %d\n", pixel_clusters[idx], aux);
+
+      printf("%d, %d, idx = %d, size = %d\n", pixel_clusters[idx], aux, 
+          get_pixel_index(x, y, res_img_struct->width), 
+          (res_img_struct->height - 1)*(res_img_struct->width - 1));
+      
       if (pixel_clusters[idx] > aux) {
-        res_img_struct->src[pixel_idx] = 255;
-        res_img_struct->src[pixel_idx + 1] = 255;
-        res_img_struct->src[pixel_idx + 2] = 255;
+        for (size_t channel_idx = 0; channel_idx < NB_CHANNELS; ++channel_idx) {
+          res_img_struct->src[pixel_idx + channel_idx] = 255;
+        }
       } else {
-        res_img_struct->src[pixel_idx] = 0;
-        res_img_struct->src[pixel_idx + 1] = 0;
-        res_img_struct->src[pixel_idx + 2] = 0;
+        for (size_t channel_idx = 0; channel_idx < NB_CHANNELS; ++channel_idx) {
+          res_img_struct->src[pixel_idx + channel_idx] = 0;
+        }
       }
     }
   }
