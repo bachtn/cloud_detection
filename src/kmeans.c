@@ -12,34 +12,41 @@ void kmeans(struct Image *res_img_struct, unsigned* pixel_clusters) {
 
   // Init the pixel vectors (Vector of the pixel with its 4 neighbors)
   int nb_vectors = (res_img_struct->width - 2) * (res_img_struct->height - 2);
+  printf("nb vectors = %d\n", nb_vectors);
   unsigned **pixel_vectors = malloc(sizeof(unsigned*) * nb_vectors);
-  printf("16 - %d\n", pixel_vectors[248064]);
   get_pixel_vectors(res_img_struct, pixel_vectors);
-  printf("18 - %d\n", pixel_vectors[248064]);
+  printf("18 %p\n", pixel_vectors[248024]);
   unsigned iteration_idx = 0;
   unsigned *old_centroids = calloc(NB_CLUSTERS, sizeof(unsigned));
 
   unsigned *cluster_occurences = calloc(NB_CLUSTERS, sizeof(unsigned));
 
-  do {
+  while (has_converged(centroids, old_centroids) && ++iteration_idx < MAX_ITERATIONS) {
     // Conserve the old clusters (needed for convergence check)
     copy_vector(centroids, NB_CLUSTERS, old_centroids);
     // Assign new clusters to the pixels depending on the new clusters
     // coordinates
     assign_cluster(res_img_struct, pixel_vectors, centroids, cluster_occurences, pixel_clusters);
-    printf("30 - %d\n", pixel_vectors[248064]);
+    printf("30 %p\n", pixel_vectors[248024]);
     // Update the cluster coordinates depending on the new pixel clusters
     update_cluster_centroids(nb_vectors, pixel_vectors, cluster_occurences, pixel_clusters, centroids);
-    printf("33 - %d\n", pixel_vectors[248064]);
+    printf("33 %p\n", pixel_vectors[248024]);
     // Set cluster occurences to 0
     fill_vector(0, NB_CLUSTERS, cluster_occurences);
-  } while (++iteration_idx < MAX_ITERATIONS || has_converged(centroids, old_centroids));
-  printf("iter = %d\n", iteration_idx);
+    printf("iter = %d\n", iteration_idx);
+  }
+
+  free(centroids);
+  free(old_centroids);
+  free(cluster_occurences);
+  for (size_t idx = 0; idx < nb_vectors; ++idx)
+    free(pixel_vectors[idx]);
+  free(pixel_vectors);
 }
 
 void assign_cluster(struct Image *img_struct, unsigned **pixel_vectors, unsigned *centroids,
     unsigned *cluster_occurences, unsigned *pixel_clusters) {
-  printf("--> Assigning pixel clusters\n");
+  //printf("--> Assigning pixel clusters\n");
     /* Computes the distance between each pixel vector and each cluster centroid
      * Assign each pixel to the nearest cluster
      */
@@ -60,7 +67,7 @@ void assign_cluster(struct Image *img_struct, unsigned **pixel_vectors, unsigned
 
 void update_cluster_centroids(unsigned nb_pixels, unsigned **pixel_vectors,
     unsigned *cluster_occurences, unsigned *pixel_clusters, unsigned *centroids) {
-    printf("--> Updating Cluster centroids\n");
+    //printf("--> Updating Cluster centroids\n");
     // Computes the new coordinates of each cluster centroid
     // For each cluster construct a vector with the values of each coordinates
     for (size_t centroid_idx = 0; centroid_idx < NB_CLUSTERS; ++centroid_idx) {
@@ -71,11 +78,12 @@ void update_cluster_centroids(unsigned nb_pixels, unsigned **pixel_vectors,
           // Get coordinate_median
           unsigned median = get_cluster_coordinate_median(centroid_idx, vec_idx, nb_pixels,
             pixel_vectors, cluster_occurences[centroid_idx], pixel_clusters);
-          current_centroid[vec_idx] = median;
+          current_centroid[vec_idx] = median; //TODO: remove current centroid not used
           new_coordinate += median;
         }
         // Project in the homogenious space
         centroids[centroid_idx] = (unsigned)(new_coordinate / NB_CLUSTERS);
+        free(current_centroid);
       }
     }
 }
@@ -99,7 +107,9 @@ unsigned get_cluster_coordinate_median(unsigned centroid_idx, unsigned vec_idx, 
   }
   quick_sort(pixel_coordinates, 0, cluster_occurence - 1);
   unsigned median_idx = (unsigned)(cluster_occurence / 2);
-  return pixel_coordinates[median_idx];
+  unsigned median = pixel_coordinates[median_idx];
+  free(pixel_coordinates);
+  return median;
 }
 
 unsigned get_pixel_closest_cluster(unsigned *pixel_vector, unsigned *centroids) {
@@ -114,7 +124,6 @@ unsigned get_pixel_closest_cluster(unsigned *pixel_vector, unsigned *centroids) 
       new_cluster_idx = centroid_idx;
     }
   }
-  //printf("dist = %d, cluster = %d", min_dist, new_cluster_idx);
   return new_cluster_idx;
 }
 
@@ -142,6 +151,7 @@ void get_pixel_vectors(struct Image *img_struct, unsigned **pixel_vectors) {
       unsigned pixel_idx = get_pixel_index(x - 1, y - 1, img_struct->width - 2);
       pixel_vectors[pixel_idx] = malloc(sizeof(unsigned) * VECTOR_SIZE);
       get_pixel_vector(img_struct, x, y, pixel_vectors[pixel_idx]);
+        quick_sort(pixel_vectors[pixel_idx], 0, VECTOR_SIZE);
     }
   }
 }
@@ -162,13 +172,20 @@ void get_pixel_vector(struct Image *img_struct, unsigned x,
 }
 
 void color_clusters(struct Image *res_img_struct, unsigned *pixel_clusters) {
+  // Color clouds with white and all the rest to black
   printf("Coloring\n");
   for (size_t y = 1; y < res_img_struct->height - 1; ++y) {
     for (size_t x = 1; x < res_img_struct->width - 1; ++x) {
       unsigned pixel_idx = get_pixel_index(x, y, res_img_struct->width) * NB_CHANNELS;
-      unsigned idx = (y - 1) * (res_img_struct->width - 2) + (x - 1); //TODO: Test
-      if (pixel_clusters[idx] > NB_CLUSTERS * CLOUD_PERCENT) { //TODO: check condition
+      unsigned idx = get_pixel_index(x - 1, y - 1, res_img_struct->width - 2);
+      unsigned aux = NB_CLUSTERS * CLOUD_PERCENT;
+      printf("%d, %d\n", pixel_clusters[idx], aux);
+      if (pixel_clusters[idx] > aux) {
         res_img_struct->src[pixel_idx] = 255;
+        res_img_struct->src[pixel_idx + 1] = 255;
+        res_img_struct->src[pixel_idx + 2] = 255;
+      } else {
+        res_img_struct->src[pixel_idx] = 0;
         res_img_struct->src[pixel_idx + 1] = 0;
         res_img_struct->src[pixel_idx + 2] = 0;
       }

@@ -4,9 +4,10 @@
 #include "tools.h"
 
 #define NB_CLUSTERS 5
-#define CONVERGENCE_THRESHOLD .0001
-#define MAX_ITERATIONS 100 // max terations by kmeans algorithm
-#define CLOUD_PERCENT .7
+#define CONVERGENCE_THRESHOLD .001
+#define MAX_ITERATIONS 25 // max terations by kmeans algorithm
+#define CLOUD_PERCENT .5
+// 5 and .5 good
 
 void kmeans(struct Image *res_img_struct, unsigned* pixel_clusters);
 void assign_cluster(struct Image *img_struct, unsigned **pixel_vectors, unsigned *centroids,
