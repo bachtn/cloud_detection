@@ -171,20 +171,21 @@ void get_pixel_vector(struct Image *img_struct, unsigned x,
       img_struct->width) * NB_CHANNELS]; // down
 }
 
-void color_clusters(struct Image *res_img_struct, unsigned *pixel_clusters) {
+float color_clusters(struct Image *res_img_struct, unsigned *pixel_clusters) {
   // Color clouds with white and all the rest to black
+  // Returns the percent of clouds in the image
   printf("Coloring\n");
+  unsigned nb_clouds = 0;
+  size_t img_size = (res_img_struct->height-1) * (res_img_struct->width-1);
+  unsigned CLOUD_TH = (float)NB_CLUSTERS * CLOUD_PERCENT;
   for (size_t y = 1; y < res_img_struct->height - 1; ++y) {
     for (size_t x = 1; x < res_img_struct->width - 1; ++x) {
       unsigned pixel_idx = get_pixel_index(x, y, res_img_struct->width) * NB_CHANNELS;
       unsigned idx = get_pixel_index(x - 1, y - 1, res_img_struct->width - 2);
-      unsigned aux = NB_CLUSTERS * CLOUD_PERCENT;
-
-      printf("%d, %d, idx = %d, size = %d\n", pixel_clusters[idx], aux, 
-          get_pixel_index(x, y, res_img_struct->width), 
-          (res_img_struct->height - 1)*(res_img_struct->width - 1));
-      
-      if (pixel_clusters[idx] > aux) {
+      printf("cluster = %d, th = %d, idx = %d, size = %d\n", pixel_clusters[idx], CLOUD_TH,
+          get_pixel_index(x, y, res_img_struct->width), img_size);
+      if (pixel_clusters[idx] > CLOUD_TH) {
+        ++nb_clouds;
         for (size_t channel_idx = 0; channel_idx < NB_CHANNELS; ++channel_idx) {
           res_img_struct->src[pixel_idx + channel_idx] = 255;
         }
@@ -195,4 +196,5 @@ void color_clusters(struct Image *res_img_struct, unsigned *pixel_clusters) {
       }
     }
   }
+  return (float)nb_clouds / (float)img_size * 100.f;
 }

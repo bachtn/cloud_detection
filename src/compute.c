@@ -16,7 +16,8 @@ void compute_image(guchar *img_src, int nb_line, int nb_col,
   kmeans(&res_img_struct, pixel_clusters);
   // Color clusters
   // The clusters will be colored in the res_image
-  color_clusters(&res_img_struct, pixel_clusters);
+  float cloud_percent = color_clusters(&res_img_struct, pixel_clusters);
+  printf("Cloud Percent : %f\n", cloud_percent);
 
   free(pixel_clusters);
 }
